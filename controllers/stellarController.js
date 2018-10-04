@@ -3,8 +3,8 @@ const StellarWrapper = require('../lib/stellarSDKWrapper');
 const StellarTrader = require('../lib/stellarTrader');
 
 exports.createAccount = async (req, res) => {
-    // check 3 params of source, destination, startingbalance
-    if (!req.body.source || !req.body.destination || !req.body.startingBalance) {
+    // check 3 params of source, startingbalance
+    if (!req.body.source || !req.body.startingBalance) {
         return res.json({
             msg: 'failure',
         })
@@ -12,7 +12,6 @@ exports.createAccount = async (req, res) => {
 
     // account details once create an account
     let account = await StellarWrapper.createAccount(req.body.source,
-        req.body.destination,
         req.body.startingBalance);
 
     res.json({
@@ -37,6 +36,26 @@ exports.getBalance = async (req, res) => {
         data: balances
     })
 };
+
+exports.sendXLM = async (req, res) => {
+    // Check params to be used for transaction
+    if (!req.body.source || !req.body.destination || !req.body.amount) {
+        return res.json({
+            msg: 'failure',
+        })
+    }
+
+    // Places order and return result
+    let ret = await StellarWrapper.payment(req.body.source,
+        req.body.destination,
+        req.body.amount
+    );
+
+    res.json({
+        msg: ret ? 'success' : 'failure',
+        data: ret
+    })
+}
 
 exports.getTransactionHistory = async (req, res) => {
     // Check accountId
