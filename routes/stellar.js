@@ -7,9 +7,10 @@ router.post('/createAccount', stellaController.createAccount);
 router.post('/getBalance', stellaController.getBalance);
 router.post('/sendXLM', stellaController.sendXLM);
 router.post('/placeOrder', stellaController.placeOrder);
+router.post('/cancelOrder', stellaController.cancelOrder);
 router.post('/sendAsset', stellaController.sendAsset);
 router.post('/startBot', stellaController.startBot);
 router.post('/getActiveOrders', stellaController.getActiveOrders);
-router.post('/getOrderHistory', stellaController.getTransactionHistory);
+router.post('/getTransactionHistory', stellaController.getTransactionHistory);
 
 module.exports = router;
