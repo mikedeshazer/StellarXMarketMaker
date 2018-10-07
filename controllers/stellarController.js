@@ -3,8 +3,8 @@ const StellarWrapper = require('../lib/stellarSDKWrapper');
 const StellarTrader = require('../lib/stellarTrader');
 
 exports.createAccount = async (req, res) => {
-    // check 3 params of source, destination, startingbalance
-    if (!req.body.source || !req.body.destination || !req.body.startingBalance) {
+    // check 3 params of source, startingbalance
+    if (!req.body.source || !req.body.startingBalance) {
         return res.json({
             msg: 'failure',
         })
@@ -12,7 +12,6 @@ exports.createAccount = async (req, res) => {
 
     // account details once create an account
     let account = await StellarWrapper.createAccount(req.body.source,
-        req.body.destination,
         req.body.startingBalance);
 
     res.json({
@@ -38,20 +37,23 @@ exports.getBalance = async (req, res) => {
     })
 };
 
-exports.getTransactionHistory = async (req, res) => {
-    // Check accountId
-    if (!req.body.accountId) {
+exports.sendXLM = async (req, res) => {
+    // Check params to be used for transaction
+    if (!req.body.source || !req.body.destination || !req.body.amount) {
         return res.json({
             msg: 'failure',
         })
     }
 
-    // Get transaction from accountId
-    let transaction = await StellarWrapper.getTransactionHistory(req.body.accountId);
+    // Places order and return result
+    let ret = await StellarWrapper.sendXLM(req.body.source,
+        req.body.destination,
+        req.body.amount
+    );
 
     res.json({
-        msg: transaction ? 'success' : 'failure',
-        data: transaction
+        msg: ret ? 'success' : 'failure',
+        data: ret
     })
 }
 
@@ -69,6 +71,80 @@ exports.sendAsset = async (req, res) => {
         req.body.amount,
         req.body.asset
     );
+
+    res.json({
+        msg: ret ? 'success' : 'failure',
+        data: ret
+    })
+}
+
+exports.getTransactionHistory = async (req, res) => {
+    // Check accountId
+    if (!req.body.accountId) {
+        return res.json({
+            msg: 'failure',
+        })
+    }
+
+    // Get transaction from accountId
+    let transaction = await StellarWrapper.getTransactionHistory(req.body.accountId);
+
+    res.json({
+        msg: transaction ? 'success' : 'failure',
+        data: transaction
+    })
+}
+
+exports.getActiveOrders = async (req, res) => {
+    // Check accountId
+    if (!req.body.accountId) {
+        return res.json({
+            msg: 'failure',
+        })
+    }
+
+    // Get active orders from accountId
+    let orders = await StellarWrapper.getActiveOffers(req.body.accountId);
+
+    res.json({
+        msg: orders ? 'success' : 'failure',
+        data: orders
+    })
+}
+
+exports.placeOrder = async (req, res) => {
+    // check 5 params of ...
+    if (!req.body.source || !req.body.selling_code || !req.body.buying_code || !req.body.amount || !req.body.price) {
+        return res.json({
+            msg: 'failure',
+        })
+    }
+
+    // return offer result 
+    let offer = await StellarWrapper.createOffer(req.body.source,
+        req.body.selling_code,
+        req.body.selling_issuer,
+        req.body.buying_code,
+        req.body.buying_issuer,
+        req.body.amount,
+        req.body.price);
+
+    res.json({
+        msg: offer ? 'success' : 'failure',
+        data: offer
+    })
+}
+
+exports.cancelOrder = async (req, res) => {
+    // check 5 params of ...
+    if (!req.body.source || !req.body.offerId) {
+        return res.json({
+            msg: 'failure',
+        })
+    }
+
+    // return offer result 
+    let ret = await StellarWrapper.cancelOffer(req.body.source, req.body.offerId);
 
     res.json({
         msg: ret ? 'success' : 'failure',
@@ -121,42 +197,4 @@ exports.startBot = async (req, res) => {
         msg: 'success',
         data: job
     });
-}
-
-exports.placeOrder = async (req, res) => {
-    // check 5 params of ...
-    if (!req.body.accountId || !req.body.selling || !req.body.buying || !req.body.amount || !req.body.price) {
-        return res.json({
-            msg: 'failure',
-        })
-    }
-
-    // return offer result 
-    let offer = await StellarWrapper.manageOffer(req.body.accountId,
-        req.body.selling,
-        req.body.buying,
-        req.body.amount,
-        req.body.price);
-
-    res.json({
-        msg: offer ? 'success' : 'failure',
-        data: offer
-    })
-};
-
-exports.getActiveOrders = async (req, res) => {
-    // Check accountId
-    if (!req.body.accountId) {
-        return res.json({
-            msg: 'failure',
-        })
-    }
-
-    // Get active orders from accountId
-    let orders = await StellarWrapper.getActiveOrders(req.body.accountId);
-
-    res.json({
-        msg: orders ? 'success' : 'failure',
-        data: orders
-    })
 }
