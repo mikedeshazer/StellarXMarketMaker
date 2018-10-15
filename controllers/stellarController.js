@@ -152,6 +152,43 @@ exports.cancelOrder = async (req, res) => {
     })
 }
 
+/**
+ * Returns Asks & Bids of particular assets, 2 assets are required.
+ */
+exports.getOrders = async (req, res) => {
+    if (!req.body.selling_code || !req.body.buying_code) {
+        return res.json({
+            msg: 'failure',
+        });
+    }
+
+    let ret = await StellarWrapper.getOrders(
+        req.body.selling_code, req.body.selling_issuer,
+        req.body.buying_code, req.body.buying_issuer);
+
+    res.json({
+        msg: ret ? 'success' : 'failure',
+        data: ret
+    });
+}
+
+exports.getTrades = async (req, res) => {
+    if (!req.body.base_code || !req.body.counter_code) {
+        return res.json({
+            msg: 'failure',
+        });
+    }
+
+    let ret = await StellarWrapper.getTrades(
+        req.body.base_code, req.body.base_issuer,
+        req.body.counter_code, req.body.counter_issuer);
+
+    res.json({
+        msg: ret ? 'success' : 'failure',
+        data: ret
+    });
+}
+
 exports.startBot = async (req, res) => {
     // Check accountId
     if (!req.body.accountId) {
