@@ -66,10 +66,11 @@ exports.sendAsset = async (req, res) => {
     }
 
     // Places order and return result
-    let ret = await StellarWrapper.payment(req.body.source,
+    let ret = await StellarWrapper.sendAsset(req.body.source,
         req.body.destination,
         req.body.amount,
-        req.body.asset
+        req.body.asset_code,
+        req.body.asset_issuer
     );
 
     res.json({
